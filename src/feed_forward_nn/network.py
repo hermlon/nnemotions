@@ -1,11 +1,11 @@
 import numpy
 from feed_forward_nn.layer import InputLayer, HiddenLayer
 from feed_forward_nn.activation_functions import SigmoidFunction
-
+from feed_forward_nn.cost_functions import CostFunctions
 
 class Network:
 
-    def __init__(self, layersizes=[5, 3, 2, 2]):
+    def __init__(self, layersizes=[2, 2, 2]):
         self.layers = []
         self.layers.append(InputLayer(layersizes[0]))
         # Every layersize except the first one as it already is the input layer
@@ -16,14 +16,16 @@ class Network:
         self.input_layer = self.layers[0]
         self.output_layer = self.layers[-1]
 
+    def train(self, input, desired_output):
+        self.input_layer.update(input)
+        error = CostFunctions.quadratic(self.output_layer.nodes, desired_output)
+        self.output_layer.error(error)
 
-        # Testing
+nn = Network()
+nn.train(numpy.array([0.7, 0.7]), numpy.array([0.2, 0.2]))
+for layer in nn.layers:
+    print(layer.errors)
 
-        self.input_layer.update(numpy.array([0.7, 0.7, 0.7, 0.7, 0.7]))
+# warum ist der Fehler in schicht 2 grosser als in schicht 3?
 
-        for layer in self.layers:
-            print(repr(layer))
-
-        #self.output_layer.error(None)
-
-Network()
+# TODO: Write tests for everything
