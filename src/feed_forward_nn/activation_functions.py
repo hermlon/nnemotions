@@ -9,8 +9,8 @@ class SigmoidFunction:
         return 1.0 / (1 + numpy.exp(-x))
 
     @staticmethod
-    def derivative(x):
-        return SigmoidFunction.normal(x) * (1 - SigmoidFunction.normal(x))
+    def derivative(sigmoidx):
+        return sigmoidx * (1 -sigmoidx)
 
 
 class LinearFunction:

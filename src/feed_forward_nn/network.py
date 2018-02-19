@@ -20,7 +20,7 @@ class Network:
     def query(self, input):
         self.input_layer.update(input)
 
-    def train(self, input, desired_output):
+    def train(self, input, desired_output, learninrate=0.5):
         self.input_layer.update(input)
         error = CostFunctions.quadratic(self.output_layer.nodes, desired_output)
         self.output_layer.error(error)
