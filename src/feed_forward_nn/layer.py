@@ -11,8 +11,8 @@ class InputLayer(Layer):
 
     def __init__(self, size):
         self.nodes = numpy.empty(size)
-        # no implementation needed, but it is going to be called
-        self.error = lambda e: None
+        # no implementation needed
+        self.error = None
         self.errors = None
 
     def update(self, input):
@@ -41,9 +41,12 @@ class HiddenLayer(Layer):
         self.on_update()
 
     # called by next_layer when passing errors
-    def error(self, next_layer_errors):
-        self.errors = numpy.dot(self.weights.T, next_layer_errors)
-        self.prev_layer.error(self.errors)
+    def error(self, layer_errors):
+        self.errors = layer_errors
+        # don't calculate for input layer
+        if self.prev_layer.error is not None:
+            prev_layer_errors = numpy.dot(self.weights.T, self.errors)
+            self.prev_layer.error(prev_layer_errors)
 
     def init_weights(self, y, x):
         # TODO: various better initialisations / negative values

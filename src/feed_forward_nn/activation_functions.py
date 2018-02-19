@@ -11,3 +11,14 @@ class SigmoidFunction:
     @staticmethod
     def derivative(x):
         return SigmoidFunction.normal(x) * (1 - SigmoidFunction.normal(x))
+
+
+class LinearFunction:
+
+    @staticmethod
+    def normal(x):
+        return x
+
+    @staticmethod
+    def derivative(x):
+        return 1
