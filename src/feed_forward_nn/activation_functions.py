@@ -10,7 +10,7 @@ class SigmoidFunction:
 
     @staticmethod
     def derivative(sigmoidx):
-        return sigmoidx * (1 -sigmoidx)
+        return sigmoidx * (1 - sigmoidx)
 
 
 class LinearFunction:

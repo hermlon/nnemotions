@@ -3,54 +3,66 @@ import numpy
 
 class Layer:
 
+    def __init__(self, size):
+        self.prev_layer = None
+        self.next_layer = None
+        self.errors = None
+        self.nodes = numpy.empty(size)
+
+    def pass_forward(self):
+        if self.next_layer is not None:
+            self.next_layer.pass_forward()
+
+    def pass_backward(self):
+        if self.prev_layer is not None:
+            self.prev_layer.pass_backward()
+
     def __repr__(self):
         return 'size: ' + str(len(self.nodes)) + '\nnodes:' + str(self.nodes)
 
 
 class InputLayer(Layer):
 
-    def __init__(self, size):
-        self.nodes = numpy.empty(size)
-        # no implementation needed
-        self.error = None
-        self.errors = None
-
-    def update(self, input):
-        self.nodes = input
-        self.on_update()
+    def start_forward_pass(self, inputnodes):
+        self.nodes = inputnodes
+        self.pass_forward()
 
 
 class HiddenLayer(Layer):
 
     def __init__(self, size, prev_layer, activation_function, weights=None):
+        super().__init__(size)
+
         self.prev_layer = prev_layer
+        self.prev_layer.next_layer = self
+
         self.activation_function = activation_function
         self.weights = weights
-        self.nodes = numpy.empty(size)
-        prev_layer.on_update = self.update
-        # no implementation needed if not overwritten, but it is going to be called
-        self.on_update = lambda: None
 
         if self.weights is None:
-            self.weights = self.init_weights(size, len(prev_layer.nodes))
+            self.init_weights(size, len(self.prev_layer.nodes))
 
-    # called from prev_layer when updated nodes
-    def update(self):
+    def pass_forward(self):
         self.nodes = self.activation_function.normal(numpy.dot(self.weights, self.prev_layer.nodes))
-        # call update of next_layer after updating own nodes
-        self.on_update()
+        super().pass_forward()
 
-    # called by next_layer when passing errors
-    def error(self, layer_errors):
-        self.errors = layer_errors
-        # don't calculate for input layer
-        if self.prev_layer.error is not None:
-            prev_layer_errors = numpy.dot(self.weights.T, self.errors)
-            self.prev_layer.error(prev_layer_errors)
+    def pass_backward(self):
+        self.errors = numpy.dot(self.next_layer.weights.T, self.next_layer.errors)
+        super().pass_backward()
 
     def init_weights(self, y, x):
         # TODO: various better initialisations / negative values
         #return numpy.random.rand(y, x)
-        return numpy.ones((y, x))
+        self.weights = numpy.ones((y, x))
+
+
+class OutputLayer(HiddenLayer):
+
+    def start_backward_pass(self, errors):
+        self.errors = errors
+        # these are the errors, don't calculate anything, just call prev_layer
+        # seems to be the best way, instead of reimplementing the pass_backward class of layer
+        # because the one in HiddenLayer is overridden
+        Layer.pass_backward(self)
 
 # TODO: Add Bias
