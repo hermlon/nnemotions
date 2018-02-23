@@ -23,7 +23,7 @@ class Network:
     def query(self, input):
         self.input_layer.start_forward_pass(input)
 
-    def train(self, input, desired_output, learninrate=0.5):
+    def train(self, input, desired_output, learninrate=1):
         self.query(input)
         error = CostFunctions.quadratic(self.output_layer.nodes, desired_output)
-        self.output_layer.start_backward_pass(error)
+        self.output_layer.start_backward_pass(error, learninrate)

@@ -38,6 +38,7 @@ class HiddenLayer(Layer):
 
         self.activation_function = activation_function
         self.weights = weights
+        self.learningrate = 1
 
         if self.weights is None:
             self.init_weights(size, len(self.prev_layer.nodes))
@@ -47,8 +48,14 @@ class HiddenLayer(Layer):
         super().pass_forward()
 
     def pass_backward(self):
+        self.learningrate = self.next_layer.learningrate
         self.errors = numpy.dot(self.next_layer.weights.T, self.next_layer.errors)
         super().pass_backward()
+
+    def update_weights(self):
+        #-= or += ???
+        #import pdb; pdb.set_trace()
+        self.weights -= self.learningrate * numpy.dot(self.errors * self.activation_function.derivative(self.nodes), self.prev_layer.nodes.T)
 
     def init_weights(self, y, x):
         # TODO: various better initialisations / negative values
@@ -58,8 +65,10 @@ class HiddenLayer(Layer):
 
 class OutputLayer(HiddenLayer):
 
-    def start_backward_pass(self, errors):
+    def start_backward_pass(self, errors, learningrate):
         self.errors = errors
+        self.learningrate = learningrate
+        self.update_weights()
         # these are the errors, don't calculate anything, just call prev_layer
         # seems to be the best way, instead of reimplementing the pass_backward class of layer
         # because the one in HiddenLayer is overridden
