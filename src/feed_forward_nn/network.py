@@ -8,6 +8,7 @@ class Network:
 
     def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidFunction):
         self.layers = []
+        self.cost = None
 
         self.layers.append(InputLayer(layersizes[0]))
         # Every layersize except the first and the last one
@@ -23,7 +24,12 @@ class Network:
     def query(self, input):
         self.input_layer.start_forward_pass(input)
 
+        return self.output_layer.nodes
+
     def train(self, input, desired_output, learninrate=1):
         self.query(input)
         error = CostFunctions.quadratic(self.output_layer.nodes, desired_output)
         self.output_layer.start_backward_pass(error, learninrate)
+
+        self.cost = CostFunctions.quadratic(self.output_layer.nodes, desired_output).sum(axis=0)
+        return self.output_layer.nodes
