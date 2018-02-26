@@ -1,15 +1,15 @@
 import unittest
 import numpy
-import operator
 import random
 from feed_forward_nn.network import Network
 from feed_forward_nn.activation_functions import LinearFunction, SigmoidFunction
+from feed_forward_nn.cost_functions import CostFunctions
+
 
 class NetworkTestCase(unittest.TestCase):
     """Tests for 'network.py'."""
 
     def test_feed_forward(self):
-        return
         """Are values passed correctly trough the network?"""
         testinput = numpy.array([0.6, 0.8], ndmin=2).T
 
@@ -31,7 +31,6 @@ class NetworkTestCase(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(nn.layers[2].nodes, testnodes_layer2)
 
     def test_propagate_backward(self):
-        return
         """Are errors passed correctly backward trough the network?"""
         testinput = numpy.array([0.6, 0.8], ndmin=2).T
         testresults = numpy.array([0.1, 0.9], ndmin=2).T
@@ -56,7 +55,6 @@ class NetworkTestCase(unittest.TestCase):
         numpy.testing.assert_array_almost_equal(nn.layers[2].errors, testerrors_layer2)
 
     def test_weight_adjustment(self):
-        return
         """Are the weights adjusted correctly?"""
 
         testinput = numpy.array([0.6, 0.8], ndmin=2).T
@@ -96,22 +94,25 @@ class NetworkTestCase(unittest.TestCase):
     def test_training_xor(self):
         """Could I have managed to write an nn which is capable of learning xor? ....nope"""
 
-        nn = Network(layersizes=[2, 2, 1], activation_function=SigmoidFunction)
+        nn = Network(layersizes=[2, 2, 1], activation_function=SigmoidFunction, bias=True)
 
-        for round in range(1000):
-            randinp = [random.getrandbits(1), random.getrandbits(1)]
-            #import pdb; pdb.set_trace()
-            nn.train(numpy.array(randinp, ndmin=2).T, operator.and_(randinp[0], randinp[1]), learninrate=0.3)
-            print(nn.cost)
+        def xor(a, b):
+            if a == b:
+                return -1
+            else:
+                return 1
 
-        #for layer in nn.layers:
-        #    print(repr(layer))
+        valuespos = [-1, 1]
 
-        print('res:')
-        print(nn.query(numpy.array([0, 0], ndmin=2).T))
-        print(nn.query(numpy.array([1, 0], ndmin=2).T))
-        print(nn.query(numpy.array([0, 1], ndmin=2).T))
+        for round in range(100):
+            randinp = [valuespos[random.getrandbits(1)], valuespos[random.getrandbits(1)]]
+            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=CostFunctions.linear)
+
+        """
+        print(nn.query(numpy.array([1, -1], ndmin=2).T))
+        print(nn.query(numpy.array([-1, 1], ndmin=2).T))
         print(nn.query(numpy.array([1, 1], ndmin=2).T))
+        print(nn.query(numpy.array([-1, -1], ndmin=2).T))"""
 
 
 if __name__ == '__main__':

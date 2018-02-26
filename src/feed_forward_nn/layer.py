@@ -3,11 +3,22 @@ import numpy
 
 class Layer:
 
-    def __init__(self, size):
+    def __init__(self, size, bias=False):
+        self.bias = bias
         self.prev_layer = None
         self.next_layer = None
         self.errors = None
-        self.nodes = numpy.zeros(size)
+        if self.bias:
+            self.nodes = numpy.zeros(size + 1)
+        else:
+            self.nodes = numpy.zeros(size)
+
+    # update nodes to given new ones, if necessary add bias node (1)
+    def update_nodes(self, new_nodes):
+        if self.bias:
+            self.nodes = numpy.append([[1]], new_nodes, axis=0)
+        else:
+            self.nodes = new_nodes
 
     def pass_forward(self):
         if self.next_layer is not None:
@@ -21,7 +32,7 @@ class Layer:
 class InputLayer(Layer):
 
     def start_forward_pass(self, inputnodes):
-        self.nodes = inputnodes
+        self.update_nodes(inputnodes)
         self.pass_forward()
 
     def __repr__(self):
@@ -30,8 +41,8 @@ class InputLayer(Layer):
 
 class HiddenLayer(Layer):
 
-    def __init__(self, size, prev_layer, activation_function, weights=None):
-        super().__init__(size)
+    def __init__(self, size, prev_layer, activation_function, weights=None, bias=False):
+        super().__init__(size, bias=bias)
 
         self.prev_layer = prev_layer
         self.prev_layer.next_layer = self
@@ -41,7 +52,7 @@ class HiddenLayer(Layer):
         self.learningrate = 1
 
         if self.weights is None:
-            self.init_weights(size, len(self.prev_layer.nodes))
+            self.init_weights(len(self.nodes), len(self.prev_layer.nodes))
 
     def pass_forward(self):
         self.nodes = self.activation_function.normal(numpy.dot(self.weights, self.prev_layer.nodes))
@@ -53,8 +64,6 @@ class HiddenLayer(Layer):
         super().pass_backward()
 
     def update_weights(self):
-        #-= or += ???
-        #import pdb; pdb.set_trace()
         self.weights -= self.learningrate * numpy.dot(self.errors * self.activation_function.derivative(self.nodes), self.prev_layer.nodes.T)
 
         if isinstance(self.prev_layer, HiddenLayer):
@@ -81,5 +90,3 @@ class OutputLayer(HiddenLayer):
         # because the one in HiddenLayer is overridden
         Layer.pass_backward(self)
         self.update_weights()
-
-# TODO: Add Bias
