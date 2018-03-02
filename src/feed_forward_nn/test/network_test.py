@@ -98,21 +98,22 @@ class NetworkTestCase(unittest.TestCase):
 
         def xor(a, b):
             if a == b:
-                return -1
+                return 0.001
             else:
                 return 1
 
-        valuespos = [-1, 1]
+        valuespos = [0.001, 1]
 
-        for round in range(100):
+        for round in range(10000):
             randinp = [valuespos[random.getrandbits(1)], valuespos[random.getrandbits(1)]]
             nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=CostFunctions.linear)
 
         """
-        print(nn.query(numpy.array([1, -1], ndmin=2).T))
-        print(nn.query(numpy.array([-1, 1], ndmin=2).T))
+        print(nn.query(numpy.array([1, 0.001], ndmin=2).T))
+        print(nn.query(numpy.array([0.001, 1], ndmin=2).T))
         print(nn.query(numpy.array([1, 1], ndmin=2).T))
-        print(nn.query(numpy.array([-1, -1], ndmin=2).T))"""
+        print(nn.query(numpy.array([0.001, 0.001], ndmin=2).T))
+        """
 
 
 if __name__ == '__main__':
