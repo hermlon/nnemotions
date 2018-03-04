@@ -6,6 +6,7 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 from face_detection.input import Input
 import time
+import cv2
 
 
 NN_EMOT_DB = 'sqlite:///../../../databases/nnemotions.db'
@@ -32,6 +33,13 @@ time.sleep(0.1)
 camera.capture(rawCapture, format="bgr")
 image = rawCapture.array
 
+
+def show(image):
+    cv2.imshow('image', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+
 # run through face detection
 face_detection = Input(image)
 face_detection.detect_faces()
@@ -40,3 +48,4 @@ face = face_detection.faces[0].resize((100, 100))
 
 res = ed.query_no_data(face)
 print(res)
+show(face)
