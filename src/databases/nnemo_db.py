@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Float, PickleType, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -24,11 +24,27 @@ class FaceImg(Base):
     emotion = relationship(Emotion)
 
     def get_img(self, dir):
-        return cv2.imread(os.path.join(dir, self.src))
+        return cv2.imread(os.path.join(dir, self.src), 0)
 
+
+class NNTraining(Base):
+    __tablename__ = 'nntraining'
+    id = Column(Integer, primary_key=True)
+    learningrate = Column(Float)
+    training_iterations = Column(Integer)
+    testing_iterations = Column(Integer)
+    blocksize = Column(Integer)
+    bias = Column(Boolean)
+    activation_function = Column(String(80))
+    cost_function = Column(String(80))
+    layersizes = Column(String(80))
+    saved_nn = Column(PickleType)
+    score = Column(Float)
+    info = Column(String(120))
+    start = Column(DateTime)
+    end = Column(DateTime)
 
 
 engine = create_engine('sqlite:///../../../databases/nnemotions.db')
 
-Base.metadata.drop_all(engine)
 Base.metadata.create_all(engine)

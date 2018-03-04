@@ -3,7 +3,7 @@ import numpy
 import random
 from feed_forward_nn.network import Network
 from feed_forward_nn.activation_functions import LinearFunction, SigmoidFunction
-from feed_forward_nn.cost_functions import CostFunctions
+from feed_forward_nn.cost_functions import Linear
 
 
 class NetworkTestCase(unittest.TestCase):
@@ -106,7 +106,7 @@ class NetworkTestCase(unittest.TestCase):
 
         for round in range(10000):
             randinp = [valuespos[random.getrandbits(1)], valuespos[random.getrandbits(1)]]
-            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=CostFunctions.linear)
+            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=Linear)
 
         """
         print(nn.query(numpy.array([1, 0.001], ndmin=2).T))

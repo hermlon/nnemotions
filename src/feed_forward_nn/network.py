@@ -1,11 +1,17 @@
 from feed_forward_nn.layer import InputLayer, HiddenLayer, OutputLayer
 from feed_forward_nn.activation_functions import SigmoidFunction
-from feed_forward_nn.cost_functions import CostFunctions
+from feed_forward_nn.cost_functions import Quadratic
 
 
 class Network:
 
-    def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidFunction, bias=False):
+    def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidFunction, cost_function=Quadratic, learningrate=1, bias=False):
+        self.layersizes = layersizes
+        self.activation_function = activation_function
+        self.cost_function = cost_function
+        self.learningrate = learningrate
+        self.bias = bias
+
         self.layers = []
         self.cost = None
 
@@ -25,10 +31,15 @@ class Network:
 
         return self.output_layer.nodes
 
-    def train(self, input, desired_output, learninrate=1, cost_function=CostFunctions.quadratic):
+    def train(self, input, desired_output, learninrate=None, cost_function=None):
+        if learninrate is None:
+            learninrate = self.learningrate
+        if cost_function is None:
+            cost_function = self.cost_function
+
         self.query(input)
-        error = cost_function(self.output_layer.nodes, desired_output)
+        error = cost_function.normal(self.output_layer.nodes, desired_output)
         self.output_layer.start_backward_pass(error, learninrate)
 
-        self.cost = cost_function(self.output_layer.nodes, desired_output).sum(axis=0)
+        self.cost = cost_function.normal(self.output_layer.nodes, desired_output).sum(axis=0)
         return self.output_layer.nodes

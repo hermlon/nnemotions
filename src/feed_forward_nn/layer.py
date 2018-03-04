@@ -71,7 +71,9 @@ class HiddenLayer(Layer):
 
     def init_weights(self, y, x):
         # TODO: various better initialisations / negative values
-        self.weights = numpy.random.rand(y, x)
+        #self.weights = numpy.random.rand(y, x)
+        #
+        self.weights = numpy.random.normal(0, pow(len(self.nodes), -0.5), (y, x))
         #self.weights = numpy.ones((y, x))
 
     def __repr__(self):

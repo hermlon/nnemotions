@@ -1,9 +1,18 @@
-class CostFunctions:
+class Quadratic:
 
     @staticmethod
-    def quadratic(a, desired):
+    def normal(a, desired):
         return (a - desired) ** 2
 
+    def __repr__(self):
+        return 'quadratic'
+
+
+class Linear:
+
     @staticmethod
-    def linear(a, desired):
+    def normal(a, desired):
         return a - desired
+
+    def __repr__(self):
+        return 'linear'

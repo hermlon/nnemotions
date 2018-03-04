@@ -12,6 +12,9 @@ class SigmoidFunction:
     def derivative(sigmoidx):
         return sigmoidx * (1 - sigmoidx)
 
+    def __repr__(self):
+        return 'sigmoid'
+
 
 class LinearFunction:
 
@@ -22,3 +25,23 @@ class LinearFunction:
     @staticmethod
     def derivative(x):
         return 1
+
+    def __repr__(self):
+        return 'linear'
+
+
+class ReLuFunction:
+
+    @staticmethod
+    def normal(x):
+        x[x<0] = 0
+        return x
+
+    @staticmethod
+    def derivative(x):
+        x[x < 0] = 0
+        x[x > 0] = 1
+        return x
+
+    def __repr__(self):
+        return 'relu'

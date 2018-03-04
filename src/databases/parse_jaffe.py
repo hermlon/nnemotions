@@ -15,13 +15,17 @@ NN_EMOT_DB = 'sqlite:///../../../databases/nnemotions.db'
 # directory to save scaled images in
 NN_EMOT_IMG_DIR = '../../../databases/img/'
 # pixels faces are scaled to
-IMG_SIZE = (50, 50)
+IMG_SIZE = (100, 100)
 
 # open database and start session
 engine = create_engine(NN_EMOT_DB)
 Base.metadata.bind = engine
+Base.metadata.drop_all()
+Base.metadata.create_all()
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
 
 # emotions used in jaffe database
 emotions = {
@@ -45,17 +49,11 @@ for file in os.listdir(DB_ORG_IMG_DIR):
             if emot.tag in file:
                 print('adding image ' + file + ' : ' + emot.tag)
 
-
-                def show(image):
-                    cv2.imshow('image', image)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
-
                 img = cv2.imread(os.path.join(DB_ORG_IMG_DIR, file))
                 face_detection = Input(img)
                 face_detection.detect_faces()
                 if len(face_detection.faces) == 0:
-                    print('No faced found in ' + file + ' : ' + emot.tag)
+                    print('No faces found in ' + file + ' : ' + emot.tag)
                 else:
                     # save scaled image to directory
                     face = face_detection.faces[0].resize(IMG_SIZE)
