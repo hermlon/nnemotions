@@ -26,7 +26,7 @@ class LBPEmotionDetection:
                          cost_function=repr(self.nn.cost_function),
                          layersizes=str(self.nn.layersizes),
                          saved_nn=pickle.dumps(self.nn),
-                         score=self.testing_score,
+                         score=self.testing_score/self.testing_iterations*100,
                          info=info,
                          start=self.start,
                          end=datetime.datetime.now())

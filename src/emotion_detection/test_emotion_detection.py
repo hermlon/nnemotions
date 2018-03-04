@@ -2,8 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from databases.nnemo_db import Base, FaceImg, Emotion
 from emotion_detection.lbp_emotion_detection import LBPEmotionDetection
-from feed_forward_nn.activation_functions import SigmoidFunction
-from feed_forward_nn.cost_functions import Linear
+from feed_forward_nn.activation_functions import SigmoidFunction, ReLuFunction
+from feed_forward_nn.cost_functions import Linear, Quadratic
 
 
 def query(tries, learn, data):
@@ -40,10 +40,54 @@ training_data = happy[:20] + sad[:20]
 test_data = happy[21:31] + sad[21:31]
 
 ed = LBPEmotionDetection(engine)
-ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
 
-print('Starting training')
-query(100, True, training_data)
-print('Starting testing')
+
+ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
+ed.new_session()
+query(70, True, training_data)
 query(1, False, test_data)
-ed.save_network('training for further testing usage')
+ed.save_network('training various parameters with jaffe dataset')
+
+# some over night tests
+
+ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Quadratic, bias=True, blocksize=25, learningrate=0.3)
+ed.new_session()
+query(70, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
+
+ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.1)
+ed.new_session()
+query(70, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
+
+ed.new_network(layersizes=[23600, 1000, 300, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=5, learningrate=0.3)
+ed.new_session()
+query(30, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
+
+ed.new_network(layersizes=[944, 100, 30, 2], activation_function=ReLuFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
+ed.new_session()
+query(70, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
+
+ed.new_network(layersizes=[944, 500, 100, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
+ed.new_session()
+query(70, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
+
+ed.new_network(layersizes=[944, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
+ed.new_session()
+query(70, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
+
+ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=1.3)
+ed.new_session()
+query(70, True, training_data)
+query(1, False, test_data)
+ed.save_network('training various parameters with jaffe dataset')
