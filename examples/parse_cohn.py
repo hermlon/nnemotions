@@ -22,7 +22,6 @@ IMG_SIZE = (100, 100)
 # open database and start session
 engine = create_engine(NN_EMOT_DB)
 Base.metadata.bind = engine
-Base.metadata.drop_all()
 Base.metadata.create_all()
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -63,8 +62,6 @@ for emotion_dir, session_dirs, f1 in os.walk(DB_ORG_EMO_DIR):
                         filecontent = open(os.path.join(record_dir, record_file[0]), 'r').read(4)
                         for emot in session.query(Emotion).filter_by(db_name='cohn').all():
                             if emot.tag in filecontent:
-                                print(emot.name)
-                                print(img_path)
                                 print('adding image ' + img_file_name + ' : ' + emot.name)
 
                                 img = cv2.imread(img_path)

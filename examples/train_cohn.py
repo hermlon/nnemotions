@@ -17,6 +17,12 @@ def query(tries, learn, happy, sad):
             des_o = [0, 1]
             img = sad[random.randint(0, len(sad)-1)]
 
+        # workaround for now...
+        if learn:
+            NN_EMOT_IMG_DIR = '../../databases/img/cohn'
+        else:
+            NN_EMOT_IMG_DIR = '../../databases/img'
+
         ed.query(img.get_img(NN_EMOT_IMG_DIR), des_o, learn=learn)
         if i % 50 == 0 or i == tries:
             percent = i / tries * 100
@@ -33,23 +39,35 @@ session = DBSession()
 
 
 cohn_imgages = session.query(FaceImg).filter_by(db_name='cohn')
-happy_images = cohn_imgages.filter(FaceImg.emotion.has(tag='5')).order_by(FaceImg.id.desc()).all()
-sad_images = cohn_imgages.filter(FaceImg.emotion.has(tag='6')).order_by(FaceImg.id.desc()).all()
+training_data_happy = cohn_imgages.filter(FaceImg.emotion.has(tag='5')).order_by(FaceImg.id.desc()).all()
+training_data_sad = cohn_imgages.filter(FaceImg.emotion.has(tag='6')).order_by(FaceImg.id.desc()).all()
 
+jaffe_images = session.query(FaceImg).filter_by(db_name='jaffe')
+test_data_happy = jaffe_images.filter(FaceImg.emotion.has(tag='HA')).order_by(FaceImg.id.desc()).all()
+test_data_sad = jaffe_images.filter(FaceImg.emotion.has(tag='SA')).order_by(FaceImg.id.desc()).all()
 
-training_data_happy = happy_images[:61]
-training_data_sad = sad_images[:20]
-test_data_happy = happy_images[61:69]
-test_data_sad = sad_images[20:28]
 
 ed = LBPEmotionDetection(engine)
 
-training_cycles = 600
+def try_configuration(layersizes, activation_function, cost_function, bias, blocksize, learningrate, training_cycles):
+    ed.new_network(layersizes=layersizes, activation_function=activation_function, cost_function=cost_function, bias=bias,
+                   blocksize=blocksize, learningrate=learningrate)
+    ed.new_session()
+    print('Training...')
+    query(training_cycles, True, training_data_happy, training_data_sad)
+    print('Testing...')
+    query(200, False, test_data_happy, test_data_sad)
+    ed.save_network('training with cohn dataset, testing/score with jaffe')
 
-ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
-ed.new_session()
-print('Training...')
-query(training_cycles, True, training_data_happy, training_data_sad)
-print('Testing...')
-query(500, False, test_data_happy, test_data_sad)
-ed.save_network('training various parameters with cohn dataset')
+# (25,25) 944 = 59 * 4 * 4
+# (5,5) 23600 = 59 * 20 * 20
+# try_configuration([944, 100, 30, 2], SigmoidFunction, Linear, True, 25, 0.3)
+try_configuration([944, 100, 30, 2], SigmoidFunction, Linear, True, 25, 0.6, 300)
+try_configuration([944, 100, 30, 2], ReLuFunction, Linear, True, 25, 0.3, 300)
+try_configuration([944, 300, 80, 20, 2], SigmoidFunction, Linear, True, 25, 0.3, 300)
+try_configuration([944, 300, 80, 20, 2], ReLuFunction, Linear, True, 25, 0.3, 300)
+try_configuration([944, 300, 80, 20, 2], SigmoidFunction, Linear, True, 25, 1.2, 300)
+try_configuration([23600, 1000, 300, 40, 2], SigmoidFunction, Linear, True, 5, 0.3, 300)
+try_configuration([23600, 1000, 300, 40, 2], ReLuFunction, Linear, True, 5, 0.3, 300)
+try_configuration([23600, 1000, 300, 40, 2], ReLuFunction, Linear, True, 5, 0.7, 300)
+try_configuration([944, 20, 40, 2], SigmoidFunction, Linear, True, 25, 0.1, 300)

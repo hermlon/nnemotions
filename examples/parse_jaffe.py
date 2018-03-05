@@ -20,7 +20,6 @@ IMG_SIZE = (100, 100)
 # open database and start session
 engine = create_engine(NN_EMOT_DB)
 Base.metadata.bind = engine
-Base.metadata.drop_all()
 Base.metadata.create_all()
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
@@ -45,7 +44,7 @@ session.commit()
 # scan directory for images, detect faces, scale faces, store their information in the db
 for file in os.listdir(DB_ORG_IMG_DIR):
     if file.endswith('.tiff'):
-        for emot in session.query(Emotion).all():
+        for emot in session.query(Emotion).filter_by(db_name='jaffe').all():
             if emot.tag in file:
                 print('adding image ' + file + ' : ' + emot.tag)
 
