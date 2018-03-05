@@ -13,6 +13,7 @@ class Emotion(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(250))
     tag = Column(String(250))
+    db_name = Column(String(250))
 
 
 class FaceImg(Base):
@@ -45,6 +46,6 @@ class NNTraining(Base):
     end = Column(DateTime)
 
 
-engine = create_engine('sqlite:///../../../databases/nnemotions.db')
+engine = create_engine('sqlite:///../../databases/nnemotions.db')
 
 Base.metadata.create_all(engine)
