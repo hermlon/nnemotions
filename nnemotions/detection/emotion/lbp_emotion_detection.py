@@ -5,17 +5,24 @@ from nnemotions.detection.emotion.local_binary_pattern import BinaryPatternAnaly
 import numpy
 import pickle
 import datetime
+import uuid
+import os
 
 
 class LBPEmotionDetection:
 
-    def __init__(self, engine):
+    def __init__(self, engine, nn_save_path):
         DBSession = sessionmaker(bind=engine)
         self.db_session = DBSession()
+        self.nn_save_path = nn_save_path
 
         self.new_session()
 
     def save_network(self, info=''):
+        file_name = str(uuid.uuid4()) + '.p'
+        f = open(os.path.join(self.nn_save_path, file_name), 'wb')
+        pickle.dump(self.nn, f)
+
         nnt = NNTraining(learningrate=self.nn.learningrate,
                          training_iterations=self.training_iterations,
                          testing_iterations=self.testing_iterations,
@@ -24,7 +31,7 @@ class LBPEmotionDetection:
                          activation_function=self.nn.activation_function.name,
                          cost_function=self.nn.cost_function.name,
                          layersizes=str(self.nn.layersizes),
-                         saved_nn=pickle.dumps(self.nn),
+                         nn_saved_name=file_name,
                          score=self.testing_score/self.testing_iterations*100,
                          info=info,
                          start=self.start,
@@ -33,7 +40,8 @@ class LBPEmotionDetection:
         self.db_session.commit()
 
     def load_network(self, nntraining):
-        self.nn = pickle.loads(nntraining.saved_nn)
+        f = open(os.path.join(self.nn_save_path, nntraining.nn_saved_name), 'rb')
+        self.nn = pickle.load(f)
         self.blocksize = nntraining.blocksize
         self.new_session()
 

@@ -39,7 +39,7 @@ class NNTraining(Base):
     activation_function = Column(String(80))
     cost_function = Column(String(80))
     layersizes = Column(String(80))
-    saved_nn = Column(PickleType)
+    nn_saved_name = Column(String(120))
     score = Column(Float)
     info = Column(String(120))
     start = Column(DateTime)

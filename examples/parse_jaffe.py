@@ -13,7 +13,7 @@ DB_ORG_IMG_DIR = '../../databases/jaffe/'
 # database to store face info and emotions
 NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
 # directory to save scaled images in
-NN_EMOT_IMG_DIR = '../../databases/img/'
+NN_EMOT_IMG_DIR = '../../databases/img/jaffe'
 # pixels faces are scaled to
 IMG_SIZE = (100, 100)
 

@@ -21,7 +21,7 @@ def query(tries, learn, happy, sad):
         if learn:
             NN_EMOT_IMG_DIR = '../../databases/img/cohn'
         else:
-            NN_EMOT_IMG_DIR = '../../databases/img'
+            NN_EMOT_IMG_DIR = '../../databases/img/jaffe'
 
         ed.query(img.get_img(NN_EMOT_IMG_DIR), des_o, learn=learn)
         if i % 50 == 0 or i == tries:
@@ -31,6 +31,7 @@ def query(tries, learn, happy, sad):
 
 NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
 NN_EMOT_IMG_DIR = '../../databases/img/cohn'
+NN_MODEL_DIR = '../../databases/nn_models'
 
 engine = create_engine(NN_EMOT_DB)
 Base.metadata.bind = engine
@@ -47,7 +48,7 @@ test_data_happy = jaffe_images.filter(FaceImg.emotion.has(tag='HA')).order_by(Fa
 test_data_sad = jaffe_images.filter(FaceImg.emotion.has(tag='SA')).order_by(FaceImg.id.desc()).all()
 
 
-ed = LBPEmotionDetection(engine)
+ed = LBPEmotionDetection(engine, NN_MODEL_DIR)
 
 def try_configuration(layersizes, activation_function, cost_function, bias, blocksize, learningrate, training_cycles):
     ed.new_network(layersizes=layersizes, activation_function=activation_function, cost_function=cost_function, bias=bias,
@@ -56,18 +57,15 @@ def try_configuration(layersizes, activation_function, cost_function, bias, bloc
     print('Training...')
     query(training_cycles, True, training_data_happy, training_data_sad)
     print('Testing...')
-    query(200, False, test_data_happy, test_data_sad)
-    ed.save_network('training with cohn dataset, testing/score with jaffe')
+    query(300, False, test_data_happy, test_data_sad)
+    ed.save_network('training: cohn, testing: jaffe, learningrate vs activation vs cost vs blocksize')
+
 
 # (25,25) 944 = 59 * 4 * 4
 # (5,5) 23600 = 59 * 20 * 20
-# try_configuration([944, 100, 30, 2], SigmoidFunction, Linear, True, 25, 0.3)
-try_configuration([944, 100, 30, 2], SigmoidFunction, Linear, True, 25, 0.6, 300)
-try_configuration([944, 100, 30, 2], ReLuFunction, Linear, True, 25, 0.3, 300)
-try_configuration([944, 300, 80, 20, 2], SigmoidFunction, Linear, True, 25, 0.3, 300)
-try_configuration([944, 300, 80, 20, 2], ReLuFunction, Linear, True, 25, 0.3, 300)
-try_configuration([944, 300, 80, 20, 2], SigmoidFunction, Linear, True, 25, 1.2, 300)
-try_configuration([23600, 1000, 300, 40, 2], SigmoidFunction, Linear, True, 5, 0.3, 300)
-try_configuration([23600, 1000, 300, 40, 2], ReLuFunction, Linear, True, 5, 0.3, 300)
-try_configuration([23600, 1000, 300, 40, 2], ReLuFunction, Linear, True, 5, 0.7, 300)
-try_configuration([944, 20, 40, 2], SigmoidFunction, Linear, True, 25, 0.1, 300)
+
+for learningrate in [x / 100.0 for x in range(1, 30, 5)]:
+    for activation_func in [SigmoidFunction, ReLuFunction]:
+        for cost_function in [Linear, Quadratic]:
+            try_configuration([944, 300, 80, 20, 2], activation_func, cost_function, True, 25, learningrate, 300)
+            try_configuration([23600, 1000, 300, 40, 2], activation_func, cost_function, True, 5, learningrate, 500)
