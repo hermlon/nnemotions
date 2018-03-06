@@ -12,7 +12,7 @@ def show(image):
     close()
 
 
-testpath = '../../databases/jaffe/KA.AN1.39.tiff'
+testpath = '../../databases/test_img/f1.jpeg'
 testimg = cv2.imread(testpath)
 fd = Input(testimg)
 fd.detect_faces()

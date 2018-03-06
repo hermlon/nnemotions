@@ -6,16 +6,18 @@ from nnemotions.detection.face.input import Input
 import cv2
 
 NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
-NN_EMOT_IMG_DIR = '../../databases/img/'
+NN_EMOT_IMG_DIR = '../../databases/img'
+NN_MODEL_DIR = '../../databases/nn_models'
 
 engine = create_engine(NN_EMOT_DB)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-nntraining = session.query(NNTraining).filter_by(id=40).first()
+#nntraining = session.query(NNTraining).filter_by(id=40).first()
+nntraining = session.query(NNTraining).first()
 print('Score: %s' % nntraining.score)
-ed = LBPEmotionDetection(engine)
+ed = LBPEmotionDetection(engine, NN_MODEL_DIR)
 ed.load_network(nntraining)
 
 def show(image):
