@@ -52,11 +52,12 @@ def try_configuration(layersizes, activation_function, cost_function, bias, bloc
 
 # (25,25) 944 = 59 * 4 * 4
 # (5,5) 23600 = 59 * 20 * 20
-"""
+
 for learningrate in [x / 100.0 for x in range(1, 30, 5)]:
     for activation_func in [SigmoidFunction, ReLuFunction]:
         for cost_function in [Linear, Quadratic]:
-            try_configuration([944, 300, 80, 20, 2], activation_func, cost_function, True, 25, learningrate, 300)
-            try_configuration([23600, 1000, 300, 40, 2], activation_func, cost_function, True, 5, learningrate, 500)
-"""
-try_configuration([944, 300, 80, 20, len(emotions)], SigmoidFunction, Linear, True, 25, 0.21, 700)
+            try_configuration([944, 300, 200, 150, 80, len(emotions)], activation_func, cost_function, True, 25, learningrate, 900)
+            try_configuration([944, 500, 80, len(emotions)], activation_func, cost_function, True, 25, learningrate, 600)
+            try_configuration([23600, 1000, 300, 40, len(emotions)], activation_func, cost_function, True, 5, learningrate, 700)
+
+# try_configuration([944, 300, 80, 20, len(emotions)], SigmoidFunction, Linear, True, 25, 0.21, 15000)
