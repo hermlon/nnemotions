@@ -53,16 +53,16 @@ class LBPEmotionDetection:
 
     def query(self, img, des_out, learn=False):
         input_nodes = self.local_binary_histogram(img)
+        desired_output = numpy.array(des_out, ndmin=2).T
         if learn:
-            res = self.nn.train(input_nodes, numpy.array(des_out, ndmin=2).T)
+            res = self.nn.train(input_nodes, desired_output)
             self.costsum += self.nn.cost
             self.training_iterations += 1
         else:
             res = self.nn.query(input_nodes)
             self.testing_iterations += 1
 
-        res_maximized = [1, 0] if res[0] > res[1] else [0, 1]
-        if des_out == res_maximized:
+        if numpy.argmax(desired_output) == numpy.argmax(res):
             if learn:
                 self.training_score += 1
             else:
