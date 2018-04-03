@@ -36,6 +36,7 @@ class BinaryPattern:
 
 class BinaryPatternAnalysis:
 
+    # TODO: make resistant to blocksizes which do not fit the image exactly
     def __init__(self, input, blocksize):
         self.matrix = input
         blockslength = (self.matrix.shape[0] // blocksize[0]) * (self.matrix.shape[1] // blocksize[1])

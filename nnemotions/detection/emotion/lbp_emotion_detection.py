@@ -18,10 +18,16 @@ class LBPEmotionDetection:
 
         self.new_session()
 
-    def save_network(self, info=''):
-        file_name = str(uuid.uuid4()) + '.p'
-        f = open(os.path.join(self.nn_save_path, file_name), 'wb')
-        pickle.dump(self.nn, f)
+    def save_network(self, info='', minscore=0.0):
+
+
+        score = self.testing_score/self.testing_iterations*100
+        nn_saved_name = 'deleted'
+        if score > minscore:
+            file_name = str(uuid.uuid4()) + '.p'
+            f = open(os.path.join(self.nn_save_path, file_name), 'wb')
+            pickle.dump(self.nn, f)
+            nn_saved_name = file_name
 
         nnt = NNTraining(learningrate=self.nn.learningrate,
                          training_iterations=self.training_iterations,
@@ -31,8 +37,8 @@ class LBPEmotionDetection:
                          activation_function=self.nn.activation_function.name,
                          cost_function=self.nn.cost_function.name,
                          layersizes=str(self.nn.layersizes),
-                         nn_saved_name=file_name,
-                         score=self.testing_score/self.testing_iterations*100,
+                         nn_saved_name=nn_saved_name,
+                         score=score,
                          info=info,
                          start=self.start,
                          end=datetime.datetime.now())

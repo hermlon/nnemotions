@@ -47,17 +47,23 @@ def try_configuration(layersizes, activation_function, cost_function, bias, bloc
     query(training_cycles, True, cohn_imgages[:len(cohn_imgages)//2])
     print('Testing...')
     query(500, False, cohn_imgages[len(cohn_imgages)//2:])
-    ed.save_network('training: cohn, all emotions')
+
+    ed.save_network('training: cohn, all emotions', minscore=60.0)
 
 
 # (25,25) 944 = 59 * 4 * 4
 # (5,5) 23600 = 59 * 20 * 20
-
-for learningrate in [x / 100.0 for x in range(1, 30, 5)]:
+cost_function = Linear
+for learningrate in [x / 100.0 for x in range(1, 26, 2)]:
     for activation_func in [SigmoidFunction, ReLuFunction]:
-        for cost_function in [Linear, Quadratic]:
-            try_configuration([944, 300, 200, 150, 80, len(emotions)], activation_func, cost_function, True, 25, learningrate, 900)
-            try_configuration([944, 500, 80, len(emotions)], activation_func, cost_function, True, 25, learningrate, 600)
-            try_configuration([23600, 1000, 300, 40, len(emotions)], activation_func, cost_function, True, 5, learningrate, 700)
+        try_configuration([944, 300, 200, 150, 80, len(emotions)], activation_func, cost_function, True, 25, learningrate, 900)
+        try_configuration([944, 500, 80, len(emotions)], activation_func, cost_function, True, 25, learningrate, 600)
+        try_configuration([23600, 1000, 300, 40, len(emotions)], activation_func, cost_function, True, 5, learningrate, 700)
+
+        try_configuration([944, 700, 600, 300, 200, 80, 35, len(emotions)], activation_func, cost_function, True, 25,
+                          learningrate, 900)
+        try_configuration([944, 150, 30, len(emotions)], activation_func, cost_function, True, 25, learningrate, 600)
+        try_configuration([23600, 2000, 1500, 1000, 450, 150, 70, len(emotions)], activation_func, cost_function, True, 5, learningrate,
+                          700)
 
 # try_configuration([944, 300, 80, 20, len(emotions)], SigmoidFunction, Linear, True, 25, 0.21, 15000)

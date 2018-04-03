@@ -1,22 +1,26 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from nnemotions.detection.emotion.nnemo_db import Base, NNTraining
+from nnemotions.detection.emotion.nnemo_db import Base, NNTraining, Emotion
 from nnemotions.detection.emotion.lbp_emotion_detection import LBPEmotionDetection
 from nnemotions.detection.face.input import Input
 import cv2
 
 NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
 NN_EMOT_IMG_DIR = '../../databases/img/'
+NN_MODELS_DIR = '../../databases/nn_models'
 
 engine = create_engine(NN_EMOT_DB)
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-nntraining = session.query(NNTraining).filter_by(id=40).first()
+nntraining = session.query(NNTraining).filter_by(id=70).first()
 print('Score: %s' % nntraining.score)
-ed = LBPEmotionDetection(engine)
+ed = LBPEmotionDetection(engine, NN_MODELS_DIR)
 ed.load_network(nntraining)
+
+# manually adjustable!
+emotions = session.query(Emotion).filter_by(db_name='cohn')
 
 def show(image):
     cv2.imshow('image', image)
@@ -30,5 +34,11 @@ fd.detect_faces()
 for face in fd.faces:
     face_img = face.resize((100, 100))
     res = ed.query_no_data(face_img)
-    print(res)
+
+    print('---------------------')
+    i = 0
+    for r in res:
+        print(emotions[i].name)
+        print(r)
+        i += 1
     show(face.img)
