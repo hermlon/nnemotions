@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from nnemotions.detection.emotion.nnemo_db import Base, NNTraining, Emotion
 from nnemotions.detection.emotion.lbp_emotion_detection import LBPEmotionDetection
 from nnemotions.detection.face.input import Input
+from nnemotions.emotion_visualisation import EmotionVisualisation
 import cv2
 
 NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
@@ -27,18 +28,26 @@ def show(image):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-image = cv2.imread('../../databases/test_img/sad2.png')
+image = cv2.imread('../../databases/test_img/f1.jpeg')
 # image = cv2.imread('../../databases/img/cohn/S063_002_00000023.png')
 fd = Input(image)
 fd.detect_faces()
+
 for face in fd.faces:
     face_img = face.resize((100, 100))
     res = ed.query_no_data(face_img)
 
+    result_dir = {}
     print('---------------------')
     i = 0
     for r in res:
+        result_dir[emotions[i].name] = r
         print(emotions[i].name)
         print(r)
         i += 1
-    show(face.img)
+
+    e = EmotionVisualisation()
+    visual = e.get_img(face.img, result_dir)
+    show(visual)
+
+# TODO: Kontrast vorher hochziehen!
