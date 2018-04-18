@@ -1,0 +1,48 @@
+<html>
+    <head>
+        <title>nnemotions</title>
+    </head>
+    <body>
+        <video width="320" height="240" />
+        <script>
+            // Prefer camera resolution nearest to 1280x720.
+            var constraints = { audio: false, video: { width: window.screen.width, height: window.screen.height } };
+
+            navigator.mediaDevices.getUserMedia(constraints)
+            .then(function(mediaStream) {
+                var video = document.querySelector('video');
+                video.srcObject = mediaStream;
+                video.onloadedmetadata = function(e) {
+                    video.play();
+                };
+            })
+            .catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+
+            video.addEventListener('canplay', function(ev){
+      if (!streaming) {
+        height = video.videoHeight / (video.videoWidth/width);
+
+        video.setAttribute('width', width);
+        video.setAttribute('height', height);
+        canvas.setAttribute('width', width);
+        canvas.setAttribute('height', height);
+        streaming = true;
+      }
+    }, false);
+
+    function takepicture() {
+    var context = canvas.getContext('2d');
+    if (width && height) {
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(video, 0, 0, width, height);
+
+      var data = canvas.toDataURL('image/png');
+      photo.setAttribute('src', data);
+    } else {
+      clearphoto();
+    }
+  }
+        </script>
+    </body>
+</html>

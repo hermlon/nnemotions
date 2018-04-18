@@ -25,7 +25,7 @@ class FaceImg(Base):
     emotion = relationship(Emotion)
 
     def get_img(self, dir):
-        return cv2.imread(os.path.join(dir, self.src), 0)
+        return cv2.imread(os.path.join(dir, self.src), 1)
 
 
 class NNTraining(Base):
