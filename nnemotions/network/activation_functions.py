@@ -42,3 +42,10 @@ class ReLuFunction:
         x[x < 0] = 0
         x[x > 0] = 1
         return x
+
+
+activation_functions = {
+    SigmoidFunction.name: SigmoidFunction,
+    LinearFunction.name: LinearFunction,
+    ReLuFunction.name: ReLuFunction
+}

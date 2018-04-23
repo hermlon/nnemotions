@@ -14,3 +14,9 @@ class Linear:
     @staticmethod
     def normal(a, desired):
         return a - desired
+
+
+cost_functions = {
+    Quadratic.name: Quadratic,
+    Linear.name: Linear
+}
