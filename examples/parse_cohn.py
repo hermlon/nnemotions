@@ -1,9 +1,9 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import uuid
 import os
 from nnemotions.detection.emotion.nnemo_db import Base, FaceImg, Emotion
 import cv2
 from nnemotions.detection.face.input import Input
+from nnemotions.util.nn_resenv import NNResEnv
 
 # script to save faces from the cohn canade database:
 # http://www.consortium.ri.cmu.edu/ckagree/index.cgi
@@ -12,38 +12,26 @@ from nnemotions.detection.face.input import Input
 DB_ORG_IMG_DIR = '../../databases/cohn_kanade/cohn-kanade-images'
 # directory the emotions are in
 DB_ORG_EMO_DIR = '../../databases/cohn_kanade/Emotion'
-# database to store face info and emotions
-NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
-# directory to save scaled images in
-NN_EMOT_IMG_DIR = '../../databases/img/cohn'
 # pixels faces are scaled to
 IMG_SIZE = (100, 100)
 
-# open database and start session
-engine = create_engine(NN_EMOT_DB)
-Base.metadata.bind = engine
-Base.metadata.create_all()
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
+NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
+NN_EMOT_IMG_DIR = '../../databases/img'
+NN_MODEL_DIR = '../../databases/nn_models'
+
+env = NNResEnv(NN_EMOT_DB, NN_MODEL_DIR, NN_EMOT_IMG_DIR)
 
 
-
-# emotions used in cohn database
-emotions = {
-    '5': 'happy',
-    '6': 'sadness',
-    '7': 'surprised',
-    '1': 'angry',
-    '3': 'disgusted',
-    '4': 'fear',
-    '0': 'neutral',
-    '2': 'contempt'
+# emotions used in cohn database and corresponding emotion ids
+emotion_tags = {
+    '5': 1,
+    '6': 2,
+    '7': 3,
+    '1': 4,
+    '3': 5,
+    '4': 6,
+    '2': 7
 }
-
-# Write available emotions to table for better linking
-for emot_short in emotions:
-    session.add(Emotion(tag=emot_short, name=emotions[emot_short], db_name='cohn'))
-session.commit()
 
 for emotion_dir, session_dirs, f1 in os.walk(DB_ORG_EMO_DIR):
     for session_dir_name in session_dirs:
@@ -60,21 +48,26 @@ for emotion_dir, session_dirs, f1 in os.walk(DB_ORG_EMO_DIR):
 
                         # read only the first 4 characters, because the 4th is the one we look for
                         filecontent = open(os.path.join(record_dir, record_file[0]), 'r').read(4)
-                        for emot in session.query(Emotion).filter_by(db_name='cohn').all():
-                            if emot.tag in filecontent:
-                                print('adding image ' + img_file_name + ' : ' + emot.name)
+                        for tag in emotion_tags:
+                            if tag in filecontent:
+                                emotion = env.db.query(Emotion).get(emotion_tags[tag])
+
+                                print('adding image ' + img_file_name + ' : ' + emotion.name)
 
                                 img = cv2.imread(img_path)
                                 face_detection = Input(img)
                                 face_detection.detect_faces()
                                 if len(face_detection.faces) == 0:
-                                    print('No faces found!')
+                                    print('No faces found in ' + img_file_name + ' : ' + emotion.name)
                                 else:
                                     # save scaled image to directory
-                                    face = face_detection.faces[0].resize(IMG_SIZE)
-                                    cv2.imwrite(os.path.join(NN_EMOT_IMG_DIR, img_file_name), face)
+                                    face = face_detection.faces[0].get_image(size=IMG_SIZE, grayscale=True)
+                                    # write image to image folder, name is a uuid
+                                    filename = str(uuid.uuid4()) + '.png'
+                                    cv2.imwrite(os.path.join(env.img_dir, filename), face)
+                                    print(os.path.join(env.img_dir, filename))
                                     # store info in database
-                                    img = FaceImg(src=img_file_name, emotion=emot, db_name='cohn')
-                                    session.add(img)
+                                    img = FaceImg(src=filename, emotion=emotion, db_name='cohn')
+                                    env.db.add(img)
 
-session.commit()
+env.db.commit()

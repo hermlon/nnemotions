@@ -2,7 +2,7 @@ import unittest
 import numpy
 import random
 from nnemotions.network.feed_forward_nn import FeedForwardNN
-from nnemotions.network.activation_functions import LinearFunction, SigmoidFunction
+from nnemotions.network.nn_functions import LinearFunction, SigmoidFunction
 from nnemotions.network.cost_functions import Linear
 
 

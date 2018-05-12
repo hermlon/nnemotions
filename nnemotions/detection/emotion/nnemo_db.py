@@ -2,18 +2,20 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Boolean, Float, Pick
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import json
-from nnemotions.network.cost_functions import cost_functions
-from nnemotions.network.activation_functions import activation_functions
+import sqlalchemy.types
+from nnemotions.network.nn_functions import nn_functions
+from sqlalchemy.types import TypeDecorator
+from sqlalchemy import MetaData
+from sqlalchemy import create_engine
 
 Base = declarative_base()
+
 
 
 class Emotion(Base):
     __tablename__ = 'emotion'
     id = Column(Integer, primary_key=True)
     name = Column(String(250))
-    tag = Column(String(250))
-    db_name = Column(String(250))
 
 
 class FaceImg(Base):
@@ -25,27 +27,43 @@ class FaceImg(Base):
     emotion = relationship(Emotion)
 
 
+class LayersizesList(TypeDecorator):
+
+    impl = sqlalchemy.types.VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
+
+
+class NNFunction(TypeDecorator):
+
+    impl = sqlalchemy.types.VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        return value.name
+
+    def process_result_value(self, value, dialect):
+        return nn_functions[value]
+
+
+
 class NNConfiguration(Base):
     __tablename__ = 'nnconfiguration'
     id = Column(Integer, primary_key=True)
-    layersizes = Column(String(80))
-    activation_function = Column(String(80))
-    cost_function = Column(String(80))
+    layersizes = Column(LayersizesList)
+    activation_function = Column(NNFunction)
+    cost_function = Column(NNFunction)
     bias = Column(Boolean)
     blocksize = Column(Integer)
     learningrate = Column(Float)
-
-    def get_layersizes(self):
-        return json.loads(self.layersizes)
-
-    def set_layersizes(self, layersizes):
-        self.layersizes = json.dumps(layersizes)
-
-    def get_cost_function(self):
-        return cost_functions[self.cost_function]
-
-    def get_activation_function(self):
-        return activation_functions[self.activation_function]
 
 
 class NNTraining(Base):
@@ -58,5 +76,14 @@ class NNTraining(Base):
     info = Column(String(120))
     start = Column(DateTime)
     end = Column(DateTime)
-    configuration_id = Column(Integer, ForeignKey('NNConfiguration.id'))
+    configuration_id = Column(Integer, ForeignKey('nnconfiguration.id'))
     configuration = relationship(NNConfiguration)
+
+
+
+# remove all tables and create all afterwards
+
+#NN_EMOT_DB = 'sqlite:////home/hermon/wpa/databases/nnemotions.db'
+#engine = create_engine(NN_EMOT_DB)
+#Base.metadata.drop_all(engine)
+#Base.metadata.create_all(engine)

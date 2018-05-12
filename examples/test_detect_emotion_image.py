@@ -55,4 +55,7 @@ for face_img in face_images[20:40]:
         visual = e.get_img(face.img, result_dir)
         show(visual)
 
+
 # TODO: Kontrast vorher hochziehen!
+# Trainieren bis Fehler < 1/1000 %, Trainingszyklen als parameter
+# gesamtfehler = summe der Fehler fuer 1 Bild ueber das gesamte Set

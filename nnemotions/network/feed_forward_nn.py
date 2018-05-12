@@ -1,11 +1,10 @@
 from nnemotions.network.layer import InputLayer, HiddenLayer, OutputLayer
-from nnemotions.network.activation_functions import SigmoidFunction
-from nnemotions.network.cost_functions import Quadratic
+from nnemotions.network.nn_functions import SigmoidActivationFunction, QuadraticCostFunction
 
 
 class FeedForwardNN:
 
-    def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidFunction, cost_function=Quadratic, learningrate=1, bias=False):
+    def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidActivationFunction, cost_function=QuadraticCostFunction, learningrate=1, bias=False):
         self.layersizes = layersizes
         self.activation_function = activation_function
         self.cost_function = cost_function

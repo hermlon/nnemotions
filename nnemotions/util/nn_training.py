@@ -1,5 +1,5 @@
 from nnemotions.util.lbp_analysis import LBPAnalysis
-from nnemotions.detection.emotion.nnemo_db import NNTraining
+from nnemotions.detection.emotion.nnemo_db import NNTraining, Emotion
 import pickle
 import datetime
 import uuid
@@ -7,6 +7,7 @@ import os
 import random
 import cv2
 import numpy
+
 
 class NNTrainingHelper:
 
@@ -67,17 +68,15 @@ class NNTrainingHelper:
 
     # generate array of desired outputs. maybe somehow out of place?!
     def generate_desired_outputs(self, face_img):
-        """
+        emotions = self.env.db.query(Emotion).all()
         des_o = []
         for emotion in emotions:
-            if training_example.emotion == emotion:
+            if face_img.emotion == emotion:
                 des_o.append(1)
             else:
                 des_o.append(0)
 
         return numpy.array(des_o, ndmin=2).T
-        """
-        pass
 
     # overwriting the nn object and hoping it has a compatible configuration
     def load_network(self, nntraining):

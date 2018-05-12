@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from nnemotions.detection.emotion.nnemo_db import Base, FaceImg, Emotion
 from nnemotions.detection.emotion.lbp_emotion_detection import LBPEmotionDetection
-from nnemotions.network.activation_functions import SigmoidFunction, ReLuFunction
+from nnemotions.network.nn_functions import SigmoidFunction, ReLuFunction
 from nnemotions.network.cost_functions import Linear, Quadratic
 
 

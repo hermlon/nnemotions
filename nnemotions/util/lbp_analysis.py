@@ -6,8 +6,8 @@ import numpy
 class LBPAnalysis:
 
     def __init__(self, nn_config):
-        self.nn = FeedForwardNN(layersizes=nn_config.get_layersizes(), activation_function=nn_config.get_activation_function(),
-                                cost_function=nn_config.get_cost_function(), learningrate=nn_config.learningrate, bias=nn_config.bias)
+        self.nn = FeedForwardNN(layersizes=nn_config.layersizes, activation_function=nn_config.activation_function,
+                                cost_function=nn_config.cost_function, learningrate=nn_config.learningrate, bias=nn_config.bias)
         self.blocksize = nn_config.blocksize
 
     def query(self, input, output=None):

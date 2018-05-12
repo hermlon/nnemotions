@@ -12,9 +12,10 @@ class Face:
 
     def get_image(self, size=None, grayscale=False):
         img = self.img
-        if grayscale:
+        # should be grayscaled and is not grayscaled yet (array only 2 dim, instead of 3 dim)
+        if grayscale and len(self.img.shape) != 2:
             img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        if size is None:
+        if size is not None:
             img = cv2.resize(img, size, interpolation=cv2.INTER_AREA)
         return img
 
