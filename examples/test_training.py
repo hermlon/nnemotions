@@ -1,9 +1,7 @@
 from nnemotions.util.nn_resenv import NNResEnv
 from nnemotions.util.nn_training import NNTrainingHelper
 from nnemotions.detection.emotion.nnemo_db import NNConfiguration, FaceImg
-from nnemotions.network.nn_functions import SigmoidActivationFunction, LinearCostFunction
-import os
-import cv2
+
 
 NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
 NN_EMOT_IMG_DIR = '../../databases/img'
