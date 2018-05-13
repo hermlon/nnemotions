@@ -8,7 +8,7 @@ class LBPAnalysis:
     def __init__(self, nn_config):
         self.nn = FeedForwardNN(layersizes=nn_config.layersizes, activation_function=nn_config.activation_function,
                                 cost_function=nn_config.cost_function, learningrate=nn_config.learningrate, bias=nn_config.bias)
-        self.blocksize = nn_config.blocksize
+        self.blocksize = (nn_config.blocksize, nn_config.blocksize)
 
     def query(self, input, output=None):
         bpa = BinaryPatternAnalysis(input, self.blocksize)
@@ -20,5 +20,5 @@ class LBPAnalysis:
         if output is not None:
             result = self.nn.train(lbp_histogram, output)
         else:
-            result = self.nn.query(input)
+            result = self.nn.query(lbp_histogram)
         return result
