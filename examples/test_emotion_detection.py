@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from nnemotions.detection.emotion.nnemo_db import Base, FaceImg, Emotion
 from nnemotions.detection.emotion.lbp_emotion_detection import LBPEmotionDetection
-from nnemotions.network.nn_functions import SigmoidFunction, ReLuFunction
+from nnemotions.network.nn_functions import SigmoidActivationFunction, ReLuActivationFunction
 from nnemotions.network.cost_functions import Linear, Quadratic
 
 
@@ -46,7 +46,7 @@ ed = LBPEmotionDetection(engine)
 training_cycles = 80
 
 
-ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
+ed.new_network(layersizes=[944, 100, 30, 2], activation_function=SigmoidActivationFunction, cost_function=Linear, bias=True, blocksize=25, learningrate=0.3)
 ed.new_session()
 query(training_cycles, True, training_data)
 query(1, False, test_data)

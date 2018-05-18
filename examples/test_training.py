@@ -29,5 +29,5 @@ trainingHelper = NNTrainingHelper(env, nn_config)
 
 trainingHelper.new_session()
 trainingHelper.train(images[:len(images)//2])
-trainingHelper.test(images[len(images)//2:])
-trainingHelper.save_network('testing 1 iteration jaffe')
+print(trainingHelper.test(images[2:3]))
+#trainingHelper.save_network('testing 1 iteration jaffe')

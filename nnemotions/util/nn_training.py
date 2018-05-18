@@ -15,8 +15,10 @@ class NNTrainingHelper:
         self.env = nn_resenv
         self.nn_config = nn_config
         self.lbpa = LBPAnalysis(self.nn_config)
+        self.new_session()
 
     def train(self, face_imgs):
+        results = []
         # train in random order
         random.shuffle(face_imgs)
         for face_img in face_imgs:
@@ -24,19 +26,32 @@ class NNTrainingHelper:
 
             desired_output = self.generate_desired_outputs(face_img)
             result = self.lbpa.query(self.read_image(face_img), desired_output)
+            # normalize maximum to 1
+            result = result / numpy.max(result)
+            results.append(list(numpy.hstack(result)))
             self.training_iterations += 1
             if numpy.argmax(desired_output) == numpy.argmax(result):
                 self.training_score += 1
 
+        # convert 2dim array to plain list
+        return results
+
     def test(self, face_imgs):
+        results = []
         for face_img in face_imgs:
             self.print_status('Testing', self.testing_iterations, self.testing_score, len(face_imgs))
 
             desired_output = self.generate_desired_outputs(face_img)
             result = self.lbpa.query(self.read_image(face_img))
+            # normalize maximum to 1
+            result = result / numpy.max(result)
+            results.append(list(numpy.hstack(result)))
             self.testing_iterations += 1
             if numpy.argmax(desired_output) == numpy.argmax(result):
                 self.testing_score += 1
+
+        # convert 2dim array to plain list
+        return results
 
     def new_session(self):
         self.start = datetime.datetime.now()
