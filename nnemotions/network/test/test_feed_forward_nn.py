@@ -2,8 +2,7 @@ import unittest
 import numpy
 import random
 from nnemotions.network.feed_forward_nn import FeedForwardNN
-from nnemotions.network.nn_functions import LinearFunction, SigmoidFunction
-from nnemotions.network.cost_functions import Linear
+from nnemotions.network.nn_functions import LinearActivationFunction, SigmoidActivationFunction, LinearCostFunction
 
 
 class NetworkTestCase(unittest.TestCase):
@@ -22,7 +21,7 @@ class NetworkTestCase(unittest.TestCase):
         testnodes_layer1 = numpy.array([0.32, 0.46, 0.6], ndmin=2).T
         testnodes_layer2 = numpy.array([0.451, 0.486], ndmin=2).T
 
-        nn = FeedForwardNN(layersizes=[2, 3, 2], activation_function=LinearFunction)
+        nn = FeedForwardNN(layersizes=[2, 3, 2], activation_function=LinearActivationFunction)
         nn.layers[1].weights = testweights_layer1
         nn.layers[2].weights = testweights_layer2
         nn.query(testinput)
@@ -45,7 +44,7 @@ class NetworkTestCase(unittest.TestCase):
         testerrors_layer1 = numpy.array([0.041779, 0.17541764, 0.074667], ndmin=2).T
         testerrors_layer2 = numpy.array([0.123201, 0.171396], ndmin=2).T
 
-        nn = FeedForwardNN(layersizes=[2, 3, 2], activation_function=LinearFunction)
+        nn = FeedForwardNN(layersizes=[2, 3, 2], activation_function=LinearActivationFunction)
         nn.layers[1].weights = testweights_layer1
         nn.layers[2].weights = testweights_layer2
         # learning rate 0 means weights won't be adjusted
@@ -82,7 +81,7 @@ class NetworkTestCase(unittest.TestCase):
         test_adjusted_weights_layer2 = numpy.array([[0.2 - 0.03942432, 0.45 - 0.05667246, 0.3 - 0.0739206],
                                                      [0.1 - 0.05484672, 0.7 - 0.07884216, 0.22 - 0.10283759]])
 
-        nn = FeedForwardNN(layersizes=[2, 3, 2], activation_function=LinearFunction)
+        nn = FeedForwardNN(layersizes=[2, 3, 2], activation_function=LinearActivationFunction)
         nn.layers[1].weights = testweights_layer1
         nn.layers[2].weights = testweights_layer2
 
@@ -94,7 +93,7 @@ class NetworkTestCase(unittest.TestCase):
     def test_training_xor(self):
         """Could I have managed to write an nn which is capable of learning xor? ....nope"""
 
-        nn = FeedForwardNN(layersizes=[2, 2, 1], activation_function=SigmoidFunction, bias=True)
+        nn = FeedForwardNN(layersizes=[2, 2, 1], activation_function=SigmoidActivationFunction, bias=True)
 
         def xor(a, b):
             if a == b:
@@ -106,7 +105,7 @@ class NetworkTestCase(unittest.TestCase):
 
         for round in range(10000):
             randinp = [valuespos[random.getrandbits(1)], valuespos[random.getrandbits(1)]]
-            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=Linear)
+            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=LinearCostFunction)
 
 
         print(nn.query(numpy.array([1, 0.001], ndmin=2).T))
