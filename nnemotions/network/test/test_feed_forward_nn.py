@@ -2,7 +2,7 @@ import unittest
 import numpy
 import random
 from nnemotions.network.feed_forward_nn import FeedForwardNN
-from nnemotions.network.nn_functions import LinearActivationFunction, SigmoidActivationFunction, LinearCostFunction
+from nnemotions.network.nn_functions import LinearActivationFunction, SigmoidActivationFunction, LinearCostFunction, QuadraticCostFunction, ReLuActivationFunction
 
 
 class NetworkTestCase(unittest.TestCase):
@@ -105,7 +105,7 @@ class NetworkTestCase(unittest.TestCase):
 
         for round in range(10000):
             randinp = [valuespos[random.getrandbits(1)], valuespos[random.getrandbits(1)]]
-            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.3, cost_function=LinearCostFunction)
+            nn.train(numpy.array(randinp, ndmin=2).T, xor(randinp[0], randinp[1]), learninrate=0.2, cost_function=QuadraticCostFunction)
 
 
         print(nn.query(numpy.array([1, 0.001], ndmin=2).T))

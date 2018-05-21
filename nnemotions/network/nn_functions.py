@@ -57,7 +57,7 @@ class LinearCostFunction:
 
     @staticmethod
     def normal(a, desired):
-        return a - desired
+        return a-desired#abs(a - desired)
 
 
 
