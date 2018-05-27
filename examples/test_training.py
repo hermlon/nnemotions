@@ -32,7 +32,7 @@ trainingHelper.new_session()
 
 # what to do for do while?
 lastcost = 100
-while lastcost > 0.001:
+while lastcost > 0.9:
     trainingHelper.train(images)
     lastcost = sum(trainingHelper.costs) / len(trainingHelper.costs)
     print(lastcost)

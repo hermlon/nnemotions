@@ -29,7 +29,7 @@ class FaceImg(Base):
 
 class LayersizesList(TypeDecorator):
 
-    impl = sqlalchemy.types.VARCHAR
+    impl = sqlalchemy.types.String
 
     def process_bind_param(self, value, dialect):
         if value is not None:
@@ -45,7 +45,7 @@ class LayersizesList(TypeDecorator):
 
 class NNFunction(TypeDecorator):
 
-    impl = sqlalchemy.types.VARCHAR
+    impl = sqlalchemy.types.String
 
     def process_bind_param(self, value, dialect):
         return value.name
@@ -82,8 +82,9 @@ class NNTraining(Base):
 
 
 # remove all tables and create all afterwards
-
-#NN_EMOT_DB = 'sqlite:////home/hermon/wpa/databases/nnemotions.db'
-#engine = create_engine(NN_EMOT_DB)
-#Base.metadata.drop_all(engine)
-#Base.metadata.create_all(engine)
+"""
+NN_EMOT_DB = 'sqlite:////home/hermlon/code/projects/wpa/databases/nnemotions.db'
+engine = create_engine(NN_EMOT_DB)
+Base.metadata.drop_all(engine)
+Base.metadata.create_all(engine)
+"""
