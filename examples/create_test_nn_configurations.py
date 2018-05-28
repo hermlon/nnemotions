@@ -10,7 +10,7 @@ env = NNResEnv(NN_EMOT_DB, NN_MODEL_DIR, NN_EMOT_IMG_DIR)
 
 # Generate some configurations for testing
 
-blocksize = (25, 25)
+blocksize = 25
 bias = True
 for activation_function in [SigmoidActivationFunction, ReLuActivationFunction]:
     for cost_function in [LinearCostFunction, QuadraticCostFunction]:
