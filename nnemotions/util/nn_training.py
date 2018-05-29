@@ -35,7 +35,7 @@ class NNTrainingHelper:
             if numpy.argmax(desired_output) == numpy.argmax(result):
                 self.training_score += 1
 
-            self.print_status('Training', self.training_iterations, self.training_score, len(face_imgs))
+            #self.print_status('Training', self.training_iterations, self.training_score, len(face_imgs))
 
         # convert 2dim array to plain list
         return results
