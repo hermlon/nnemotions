@@ -16,28 +16,28 @@ class NNTrainingHelper:
         self.nn_config = nn_config
         self.lbpa = LBPAnalysis(self.nn_config)
         self.new_session()
+        self.info = False
 
     def train(self, face_imgs):
         results = []
-        self.costs = []
         # train in random order
         random.shuffle(face_imgs)
         for face_img in face_imgs:
             desired_output = self.generate_desired_outputs(face_img)
+
             result = self.lbpa.query(self.read_image(face_img), desired_output)
 
-            #print(self.lbpa.nn.cost)
             self.costs.append(self.lbpa.nn.cost)
             # normalize maximum to 1
             result = result / numpy.max(result)
+            # convert 2dim array to plain list
             results.append(list(numpy.hstack(result)))
             self.training_iterations += 1
             if numpy.argmax(desired_output) == numpy.argmax(result):
                 self.training_score += 1
 
-            #self.print_status('Training', self.training_iterations, self.training_score, len(face_imgs))
+            self.print_status('Training', self.training_iterations, self.training_score, len(face_imgs))
 
-        # convert 2dim array to plain list
         return results
 
     def test(self, face_imgs):
@@ -47,6 +47,7 @@ class NNTrainingHelper:
             result = self.lbpa.query(self.read_image(face_img))
             # normalize maximum to 1
             result = result / numpy.max(result)
+            # convert 2dim array to plain list
             results.append(list(numpy.hstack(result)))
             self.testing_iterations += 1
             if numpy.argmax(desired_output) == numpy.argmax(result):
@@ -54,7 +55,6 @@ class NNTrainingHelper:
 
             self.print_status('Testing', self.testing_iterations, self.testing_score, len(face_imgs))
 
-        # convert 2dim array to plain list
         return results
 
     def new_session(self):
@@ -70,6 +70,7 @@ class NNTrainingHelper:
         return cv2.imread(os.path.join(self.env.img_dir, face_img.src), 0)
 
     def save_network(self, info='', minscore=0.0):
+        print(self.costs)
         score = self.testing_score / self.testing_iterations * 100
         nn_saved_name = 'deleted'
         if score > minscore:
@@ -83,6 +84,7 @@ class NNTrainingHelper:
                          nn_saved_name=nn_saved_name,
                          score=round(score, 2),
                          info=info,
+                         costs=self.costs,
                          start=self.start,
                          end=datetime.datetime.now(),
                          configuration=self.nn_config)
@@ -107,4 +109,5 @@ class NNTrainingHelper:
         self.lbpa.nn = pickle.load(f)
 
     def print_status(self, mode, current, score, total):
-        print('{}: {:.1%} Score: {:.1%} Cost: {}'.format(mode, current / total, score / total, self.costs[-1]))
+        if self.info:
+            print('{}: {:.1%} Score: {:.1%} Cost: {}'.format(mode, current / total, score / total, self.costs[-1]))

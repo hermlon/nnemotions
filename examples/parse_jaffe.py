@@ -3,7 +3,7 @@ import os
 from nnemotions.detection.emotion.nnemo_db import FaceImg, Emotion
 import cv2
 from nnemotions.detection.face.input import Input
-from nnemotions.util.nn_resenv import NNResEnv
+from nnemotions.env import env
 
 # script to save faces from the jaffe database:
 # http://www.kasrl.org/jaffedb_info.html
@@ -13,11 +13,6 @@ DB_ORG_IMG_DIR = '../../databases/jaffe'
 # pixels faces are scaled to
 IMG_SIZE = (100, 100)
 
-NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
-NN_EMOT_IMG_DIR = '../../databases/img'
-NN_MODEL_DIR = '../../databases/nn_models'
-
-env = NNResEnv(NN_EMOT_DB, NN_MODEL_DIR, NN_EMOT_IMG_DIR)
 
 
 # emotions used in jaffe

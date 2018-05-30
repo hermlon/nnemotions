@@ -42,5 +42,6 @@ class FeedForwardNN:
 
         #print('.........')
         #print(self.output_layer.nodes)
-        self.cost = cost_function.normal(self.output_layer.nodes, desired_output).sum(axis=0)
+        # cost as float instead of one element numpy array
+        self.cost = float(cost_function.normal(self.output_layer.nodes, desired_output).sum(axis=0))
         return self.output_layer.nodes

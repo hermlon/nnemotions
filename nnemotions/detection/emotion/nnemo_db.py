@@ -27,7 +27,7 @@ class FaceImg(Base):
     emotion = relationship(Emotion)
 
 
-class LayersizesList(TypeDecorator):
+class DatabaseList(TypeDecorator):
 
     impl = sqlalchemy.types.String
 
@@ -58,13 +58,15 @@ class NNFunction(TypeDecorator):
 class NNConfiguration(Base):
     __tablename__ = 'nnconfiguration'
     id = Column(Integer, primary_key=True)
-    layersizes = Column(LayersizesList)
+    layersizes = Column(DatabaseList)
     activation_function = Column(NNFunction)
     cost_function = Column(NNFunction)
     bias = Column(Boolean)
     blocksize = Column(Integer)
     learningrate = Column(Float)
 
+    def __repr__(self):
+        return '[{}]: ({}) {} {} {} {} {}'.format(self.id, self.layersizes, self.activation_function, self.cost_function, self.bias, self.blocksize, self.learningrate)
 
 class NNTraining(Base):
     __tablename__ = 'nntraining'
@@ -73,6 +75,7 @@ class NNTraining(Base):
     testing_iterations = Column(Integer)
     nn_saved_name = Column(String(120))
     score = Column(Float)
+    costs = Column(DatabaseList)
     info = Column(String(120))
     start = Column(DateTime)
     end = Column(DateTime)
@@ -80,11 +83,9 @@ class NNTraining(Base):
     configuration = relationship(NNConfiguration)
 
 
-
-# remove all tables and create all afterwards
-"""
-NN_EMOT_DB = 'sqlite:////home/hermlon/code/projects/wpa/databases/nnemotions.db'
-engine = create_engine(NN_EMOT_DB)
-Base.metadata.drop_all(engine)
-Base.metadata.create_all(engine)
-"""
+if __name__ == '__main__':
+    # remove all tables and create all afterwards
+    NN_EMOT_DB = 'sqlite:////home/hermlon/code/projects/wpa/databases/nnemotions.db'
+    engine = create_engine(NN_EMOT_DB)
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)

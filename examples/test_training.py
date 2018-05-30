@@ -1,16 +1,7 @@
-from nnemotions.util.nn_resenv import NNResEnv
+from nnemotions.env import env
 from nnemotions.util.nn_training import NNTrainingHelper
 from nnemotions.detection.emotion.nnemo_db import NNConfiguration, FaceImg
 from nnemotions.network.nn_functions import SigmoidActivationFunction, QuadraticCostFunction
-
-import matplotlib.pyplot as plt
-
-
-NN_EMOT_DB = 'sqlite:///../../databases/nnemotions.db'
-NN_EMOT_IMG_DIR = '../../databases/img'
-NN_MODEL_DIR = '../../databases/nn_models'
-
-env = NNResEnv(NN_EMOT_DB, NN_MODEL_DIR, NN_EMOT_IMG_DIR)
 
 """
 nn_config = NNConfiguration(bias=True, layersizes=[944, 200, 7],
@@ -20,31 +11,33 @@ nn_config = NNConfiguration(bias=True, layersizes=[944, 200, 7],
                             learningrate=0.2)
 
 """
-#env.db.add(nn_config)
-#env.db.commit()
 
+nn_configs = env.db.query(NNConfiguration).all()
 
-nn_config = env.db.query(NNConfiguration).get(68)
+img_em = []
+for em in range(1, 8):
+    img_em.append(env.db.query(FaceImg).filter_by(emotion_id=str(em)).all())
 
-img_train = env.db.query(FaceImg).filter_by(db_name='cohn').all()
-img_test = env.db.query(FaceImg).all()
+img_train = []
+img_test = []
+max_samples = [150, 150, 150, 150, 150, 20, 150]
+# add maximal available images to training data and the rest to testing data
+for i in range(len(img_em)):
+    img_train += img_em[i][:max_samples[i]]
+    img_test += img_em[i][max_samples[i]:]
 
-trainingHelper = NNTrainingHelper(env, nn_config)
+#img_train = img_train[:5]
+#img_test = img_test[:5]
 
-trainingHelper.new_session()
-
-# what to do for do while?
-costs = []
-#while lastcost > 0.9:
-try:
-    for i in range(1):
-        trainingHelper.train(img_train)
-        costs += trainingHelper.costs# / len(trainingHelper.costs)
-        print(i)
-except(KeyboardInterrupt):
-    print('Cancelling Training')
-
-plt.plot(costs)
-plt.show()
-#print(trainingHelper.test(img_test))
-#trainingHelper.save_network('min cost: 0.9; train cohn; testing all')
+for nn_config in nn_configs:
+    print(repr(nn_config))
+    trainingHelper = NNTrainingHelper(env, nn_config)
+    trainingHelper.new_session()
+    try:
+        for i in range(100):
+            trainingHelper.train(img_train)
+            print('epoch {}'.format(i))
+    except(KeyboardInterrupt):
+        print('Cancelling Training')
+    trainingHelper.test(img_test)
+    trainingHelper.save_network('training 150 of (all) emotions, rest for testing', minscore=50)
