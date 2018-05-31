@@ -30,7 +30,7 @@ class FeedForwardNN:
 
         return self.output_layer.nodes
 
-    def train(self, input, desired_output, learninrate=None, cost_function=None):
+    def train(self, input, desired_output, learninrate=None, cost_function=None, update_weights=True):
         if learninrate is None:
             learninrate = self.learningrate
         if cost_function is None:
@@ -38,7 +38,8 @@ class FeedForwardNN:
 
         self.query(input)
         error = cost_function.normal(self.output_layer.nodes, desired_output)
-        self.output_layer.start_backward_pass(error, learninrate)
+        if update_weights:
+            self.output_layer.start_backward_pass(error, learninrate)
 
         #print('.........')
         #print(self.output_layer.nodes)

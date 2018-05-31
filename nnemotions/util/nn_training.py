@@ -18,16 +18,16 @@ class NNTrainingHelper:
         self.new_session()
         self.info = False
 
-    def train(self, face_imgs):
+    def train(self, face_imgs, emotions):
         results = []
         # train in random order
         random.shuffle(face_imgs)
         for face_img in face_imgs:
-            desired_output = self.generate_desired_outputs(face_img)
+            desired_output = self.generate_desired_outputs(face_img, emotions)
 
             result = self.lbpa.query(self.read_image(face_img), desired_output)
 
-            self.costs.append(self.lbpa.nn.cost)
+            self.train_costs.append(self.lbpa.nn.cost)
             # normalize maximum to 1
             result = result / numpy.max(result)
             # convert 2dim array to plain list
@@ -40,11 +40,13 @@ class NNTrainingHelper:
 
         return results
 
-    def test(self, face_imgs):
+    def test(self, face_imgs, emotions):
         results = []
         for face_img in face_imgs:
-            desired_output = self.generate_desired_outputs(face_img)
-            result = self.lbpa.query(self.read_image(face_img))
+            desired_output = self.generate_desired_outputs(face_img, emotions)
+            result = self.lbpa.query(self.read_image(face_img), desired_output, update_weights=False)
+
+            self.test_costs.append(self.lbpa.nn.cost)
             # normalize maximum to 1
             result = result / numpy.max(result)
             # convert 2dim array to plain list
@@ -63,14 +65,14 @@ class NNTrainingHelper:
         self.testing_iterations = 0
         self.training_score = 0
         self.testing_score = 0
-        self.costs = []
+        self.train_costs = []
+        self.test_costs = []
 
     def read_image(self, face_img):
         # read greyscale image from env img dir at specific source
         return cv2.imread(os.path.join(self.env.img_dir, face_img.src), 0)
 
     def save_network(self, info='', minscore=0.0):
-        print(self.costs)
         score = self.testing_score / self.testing_iterations * 100
         nn_saved_name = 'deleted'
         if score > minscore:
@@ -84,7 +86,8 @@ class NNTrainingHelper:
                          nn_saved_name=nn_saved_name,
                          score=round(score, 2),
                          info=info,
-                         costs=self.costs,
+                         train_costs=self.train_costs,
+                         test_costs=self.test_costs,
                          start=self.start,
                          end=datetime.datetime.now(),
                          configuration=self.nn_config)
@@ -92,8 +95,7 @@ class NNTrainingHelper:
         self.env.db.commit()
 
     # generate array of desired outputs. maybe somehow out of place?!
-    def generate_desired_outputs(self, face_img):
-        emotions = self.env.db.query(Emotion).all()
+    def generate_desired_outputs(self, face_img, emotions):
         des_o = []
         for emotion in emotions:
             if face_img.emotion == emotion:
@@ -110,4 +112,4 @@ class NNTrainingHelper:
 
     def print_status(self, mode, current, score, total):
         if self.info:
-            print('{}: {:.1%} Score: {:.1%} Cost: {}'.format(mode, current / total, score / total, self.costs[-1]))
+            print('{}: {:.1%} Score: {:.1%} Cost: {}'.format(mode, current / total, score / total, self.train_costs[-1]))

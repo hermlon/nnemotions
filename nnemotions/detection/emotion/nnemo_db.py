@@ -75,7 +75,8 @@ class NNTraining(Base):
     testing_iterations = Column(Integer)
     nn_saved_name = Column(String(120))
     score = Column(Float)
-    costs = Column(DatabaseList)
+    train_costs = Column(DatabaseList)
+    test_costs = Column(DatabaseList)
     info = Column(String(120))
     start = Column(DateTime)
     end = Column(DateTime)
@@ -87,5 +88,6 @@ if __name__ == '__main__':
     # remove all tables and create all afterwards
     NN_EMOT_DB = 'sqlite:////home/hermlon/code/projects/wpa/databases/nnemotions.db'
     engine = create_engine(NN_EMOT_DB)
-    Base.metadata.drop_all(engine)
+    #Base.metadata.drop_all(engine)
+    NNTraining.__table__.drop(engine)
     Base.metadata.create_all(engine)

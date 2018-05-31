@@ -12,5 +12,8 @@ if nn_training_id == '':
 else:
     nn_training = env.db.query(NNTraining).get(nn_training_id)
 
-plt.plot(nn_training.costs)
+print('[{}] Score: {}'.format(nn_training.id, nn_training.score))
+fig, ax = plt.subplots()
+plt.plot(nn_training.train_costs)
+plt.plot(nn_training.test_costs)
 plt.show()

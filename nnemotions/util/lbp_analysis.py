@@ -10,7 +10,7 @@ class LBPAnalysis:
                                 cost_function=nn_config.cost_function, learningrate=nn_config.learningrate, bias=nn_config.bias)
         self.blocksize = (nn_config.blocksize, nn_config.blocksize)
 
-    def query(self, input, output=None):
+    def query(self, input, output=None, update_weights=True):
         bpa = BinaryPatternAnalysis(input, self.blocksize)
         # convert list to numpy array, maybe outsource to get_histogram()
         lbp_histogram = numpy.array(bpa.get_histogram(), ndmin=2).T
@@ -18,7 +18,7 @@ class LBPAnalysis:
         lbp_histogram = lbp_histogram / lbp_histogram.max()
 
         if output is not None:
-            result = self.nn.train(lbp_histogram, output)
+            result = self.nn.train(lbp_histogram, output, update_weights=update_weights)
         else:
             result = self.nn.query(lbp_histogram)
         return result

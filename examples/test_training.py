@@ -1,6 +1,6 @@
 from nnemotions.env import env
 from nnemotions.util.nn_training import NNTrainingHelper
-from nnemotions.detection.emotion.nnemo_db import NNConfiguration, FaceImg
+from nnemotions.detection.emotion.nnemo_db import NNConfiguration, FaceImg, Emotion
 from nnemotions.network.nn_functions import SigmoidActivationFunction, QuadraticCostFunction
 
 """
@@ -12,15 +12,18 @@ nn_config = NNConfiguration(bias=True, layersizes=[944, 200, 7],
 
 """
 
-nn_configs = env.db.query(NNConfiguration).all()
+nn_configs = [env.db.query(NNConfiguration).get(34)]
+
+emotions = [env.db.query(Emotion).get(1), env.db.query(Emotion).get(2)]
 
 img_em = []
-for em in range(1, 8):
-    img_em.append(env.db.query(FaceImg).filter_by(emotion_id=str(em)).all())
+for em in emotions:
+    img_em.append(env.db.query(FaceImg).filter_by(emotion=em, db_name='jaffe').all())
 
 img_train = []
 img_test = []
-max_samples = [150, 150, 150, 150, 150, 20, 150]
+#max_samples = [150, 150, 150, 150, 150, 20, 150]
+max_samples = [20, 20, 20, 20, 20, 0, 20]
 # add maximal available images to training data and the rest to testing data
 for i in range(len(img_em)):
     img_train += img_em[i][:max_samples[i]]
@@ -34,10 +37,10 @@ for nn_config in nn_configs:
     trainingHelper = NNTrainingHelper(env, nn_config)
     trainingHelper.new_session()
     try:
-        for i in range(100):
-            trainingHelper.train(img_train)
+        for i in range(10):
+            trainingHelper.train(img_train, emotions)
             print('epoch {}'.format(i))
     except(KeyboardInterrupt):
         print('Cancelling Training')
-    trainingHelper.test(img_test)
-    trainingHelper.save_network('training 150 of (all) emotions, rest for testing', minscore=50)
+    trainingHelper.test(img_test, emotions)
+    trainingHelper.save_network('happy/sad training 20 of jaffe, rest jaffe for testing', minscore=50)
