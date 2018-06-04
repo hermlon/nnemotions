@@ -37,7 +37,7 @@ class FeedForwardNN:
             cost_function = self.cost_function
 
         self.query(input)
-        error = cost_function.normal(self.output_layer.nodes, desired_output)
+        error = desired_output - self.output_layer.nodes
         if update_weights:
             self.output_layer.start_backward_pass(error, learninrate)
 

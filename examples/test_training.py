@@ -12,7 +12,7 @@ nn_config = NNConfiguration(bias=True, layersizes=[944, 200, 7],
 
 """
 
-nn_configs = [env.db.query(NNConfiguration).get(34)]
+nn_configs = [env.db.query(NNConfiguration).get(35)]
 
 emotions = [env.db.query(Emotion).get(1), env.db.query(Emotion).get(2)]
 

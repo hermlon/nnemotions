@@ -64,7 +64,7 @@ class HiddenLayer(Layer):
         super().pass_backward()
 
     def update_weights(self):
-        self.weights -= self.learningrate * numpy.dot(self.errors * self.activation_function.derivative(self.nodes), self.prev_layer.nodes.T)
+        self.weights += self.learningrate * numpy.dot(self.errors * self.activation_function.derivative(self.nodes), self.prev_layer.nodes.T)
 
         if isinstance(self.prev_layer, HiddenLayer):
             self.prev_layer.update_weights()
