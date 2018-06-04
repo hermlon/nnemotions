@@ -34,10 +34,10 @@ for nn_config in nn_configs:
     trainingHelper = NNTrainingHelper(env, nn_config)
     trainingHelper.new_session()
     try:
-        for i in range(7):
+        for i in range(4):
             trainingHelper.train(img_train, emotions)
             print('epoch {}'.format(i))
     except(KeyboardInterrupt):
         print('Cancelling Training')
     trainingHelper.test(img_test, emotions)
-    trainingHelper.save_network('7 epochs; training all emotions all databases, first 150 for training, rest for testing', minscore=80)
+    trainingHelper.save_network('4 epochs; training all emotions all databases, first 150 for training, rest for testing', minscore=80)
