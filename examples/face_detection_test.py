@@ -21,14 +21,14 @@ testimg = cv2.imread(testpath, 1)
 fd = Input(testimg)
 fd.detect_faces()
 
-nntraining = env.db.query(NNTraining).get(39)
+nntraining = env.db.query(NNTraining).get(78)
 
 th = NNTrainingHelper(env, nntraining.configuration)
 th.load_network(nntraining)
 
 emotions = env.db.query(Emotion).all()
 
-for face in fd.faces[:1]:
+for face in fd.faces:
     data = {}
     img = face.get_image(size=(100,100), grayscale=True)
     res = th.query(img)
