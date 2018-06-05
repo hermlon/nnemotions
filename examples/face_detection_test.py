@@ -1,7 +1,9 @@
 import cv2
-import numpy
-import math
 from nnemotions.detection.face.input import Input
+from nnemotions.emotion_visualisation import EmotionVisualisation
+from nnemotions.env import env
+from nnemotions.util.nn_training import NNTrainingHelper
+from nnemotions.detection.emotion.nnemo_db import NNTraining, Emotion
 
 
 def close():
@@ -14,23 +16,27 @@ def show(image):
     close()
 
 
-testpath = '../../databases/img/cohn/S138_007_00000011.png'
+testpath = '../../databases/test_img/f8.jpeg'
 testimg = cv2.imread(testpath, 1)
 fd = Input(testimg)
 fd.detect_faces()
 
+nntraining = env.db.query(NNTraining).get(39)
 
-img = fd.faces[0].img
+th = NNTrainingHelper(env, nntraining.configuration)
+th.load_network(nntraining)
 
+emotions = env.db.query(Emotion).all()
 
-def f(x):
-    #x1 = int(x * 2 / 2)
-    import pdb;
-    #pdb.set_trace()
-    return numpy.int_(x*2)#int(((x / 255) ** (1 / 1)) * 255)
+for face in fd.faces[:1]:
+    data = {}
+    img = face.get_image(size=(100,100), grayscale=True)
+    res = th.query(img)
+    print(res)
 
-img2 = f(img)
-
-
-print(img2)
-show(img2)
+    i = 0
+    for e in emotions:
+        data[e.name] = res[i]
+        i += 1
+    info_img = EmotionVisualisation().get_img(face.img, data)
+    show(info_img)

@@ -59,6 +59,12 @@ class NNTrainingHelper:
 
         return results
 
+    def query(self, img):
+        result = self.lbpa.query(img, update_weights=False)
+        result = result / numpy.max(result)
+        # convert 2dim array to plain list
+        return list(numpy.hstack(result))
+
     def new_session(self):
         self.start = datetime.datetime.now()
         self.training_iterations = 0
@@ -109,6 +115,7 @@ class NNTrainingHelper:
     def load_network(self, nntraining):
         f = open(os.path.join(self.env.model_dir, nntraining.nn_saved_name), 'rb')
         self.lbpa.nn = pickle.load(f)
+        print(self.lbpa.nn.layersizes)
 
     def print_status(self, mode, current, score, total):
         if self.info:
