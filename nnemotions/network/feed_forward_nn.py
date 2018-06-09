@@ -1,11 +1,10 @@
 from nnemotions.network.layer import InputLayer, HiddenLayer, OutputLayer
-from nnemotions.network.activation_functions import SigmoidFunction
-from nnemotions.network.cost_functions import Quadratic
+from nnemotions.network.nn_functions import SigmoidActivationFunction, QuadraticCostFunction
 
 
 class FeedForwardNN:
 
-    def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidFunction, cost_function=Quadratic, learningrate=1, bias=False):
+    def __init__(self, layersizes=[2, 2, 2], activation_function=SigmoidActivationFunction, cost_function=QuadraticCostFunction, learningrate=1, bias=False):
         self.layersizes = layersizes
         self.activation_function = activation_function
         self.cost_function = cost_function
@@ -31,15 +30,19 @@ class FeedForwardNN:
 
         return self.output_layer.nodes
 
-    def train(self, input, desired_output, learninrate=None, cost_function=None):
+    def train(self, input, desired_output, learninrate=None, cost_function=None, update_weights=True):
         if learninrate is None:
             learninrate = self.learningrate
         if cost_function is None:
             cost_function = self.cost_function
 
         self.query(input)
-        error = cost_function.normal(self.output_layer.nodes, desired_output)
-        self.output_layer.start_backward_pass(error, learninrate)
+        error = desired_output - self.output_layer.nodes
+        if update_weights:
+            self.output_layer.start_backward_pass(error, learninrate)
 
-        self.cost = cost_function.normal(self.output_layer.nodes, desired_output).sum(axis=0)
+        #print('.........')
+        #print(self.output_layer.nodes)
+        # cost as float instead of one element numpy array
+        self.cost = float(cost_function.normal(self.output_layer.nodes, desired_output).sum(axis=0))
         return self.output_layer.nodes

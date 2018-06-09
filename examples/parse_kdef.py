@@ -1,42 +1,39 @@
 import uuid
 import os
-from nnemotions.detection.emotion.nnemo_db import FaceImg, Emotion
+from nnemotions.detection.emotion.nnemo_db import Base, FaceImg, Emotion
 import cv2
 from nnemotions.detection.face.input import Input
 from nnemotions.env import env
 
-# script to save faces from the jaffe database:
-# http://www.kasrl.org/jaffedb_info.html
+# script to save faces from the cohn canade database:
+# http://www.consortium.ri.cmu.edu/ckagree/index.cgi
 
 # directory the original images are in
-DB_ORG_IMG_DIR = '../../databases/jaffe'
+DB_ORG_IMG_DIR = '../../databases/KDEF'
+
 # pixels faces are scaled to
 IMG_SIZE = (100, 100)
 
 
-
-# emotions used in jaffe
-# database and the corresponding ids
+# emotions used in cohn database and corresponding emotion ids
 emotion_tags = {
-    'HA': 1,
-    'SA': 2,
-    'SU': 3,
-    'AN': 4,
-    'DI': 5,
-    'FE': 7
+    'HAS': 1,
+    'SAS': 2,
+    'SUS': 3,
+    'ANS': 4,
+    'DIS': 5,
+    'AFS': 7
 }
 
-# scan directory for images, detect faces, scale faces, store their information in the db
-
-for file in os.listdir(DB_ORG_IMG_DIR):
-    if file.endswith('.tiff'):
+for session_dir, other_dirs, files in os.walk(DB_ORG_IMG_DIR):
+    for file in files:
         for tag in emotion_tags:
             if tag in file:
                 emotion = env.db.query(Emotion).get(emotion_tags[tag])
 
                 print('adding image ' + file + ' : ' + emotion.name)
 
-                img = cv2.imread(os.path.join(DB_ORG_IMG_DIR, file))
+                img = cv2.imread(os.path.join(NN_EMOT_IMG_DIR, session_dir, file))
                 face_detection = Input(img)
                 face_detection.detect_faces()
                 if len(face_detection.faces) == 0:
@@ -49,7 +46,7 @@ for file in os.listdir(DB_ORG_IMG_DIR):
                     cv2.imwrite(os.path.join(env.img_dir, filename), face)
                     print(os.path.join(env.img_dir, filename))
                     # store info in database
-                    img = FaceImg(src=filename, emotion=emotion, db_name='jaffe')
+                    img = FaceImg(src=filename, emotion=emotion, db_name='kdef')
                     env.db.add(img)
 
 env.db.commit()
