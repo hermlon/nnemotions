@@ -14,6 +14,8 @@ else:
 
 print('[{}] Score: {}'.format(nn_training.id, nn_training.score))
 fig, ax = plt.subplots()
+ax.set_ylabel('Kosten')
+ax.set_xlabel('Trainingsbeispiel')
 plt.plot(nn_training.train_costs)
 plt.plot(nn_training.test_costs)
 plt.show()
