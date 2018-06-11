@@ -18,7 +18,7 @@ class EmotionVisualisation:
 
         maxval = params[max(params, key=params.get)]
         color_i = 0
-        colors = [(41, 205, 255), (245, 73, 46), (208, 52, 219), (17, 27, 166), (46, 107, 21), (119, 16, 135), (246, 246, 126)]
+        colors = [(255, 205, 41), (46, 73, 246), (219, 52, 208), (166, 27, 17), (21, 107, 46), (135, 16, 119), (26, 146, 146)]
         for param in params:
             # cycle through colors
             self.draw_bar(visual, y, param, params[param] / maxval, color=colors[color_i%len(colors)])
