@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 class EmotionVisualisation:
 
     def __init__(self):
@@ -9,11 +10,7 @@ class EmotionVisualisation:
         pass
 
     def get_img(self, img, params):
-        # img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-
         visual = np.zeros((len(params) * self.row_height, img.shape[0], 3), np.uint8)
-
-        #visual[0:img.shape[0], 0:img.shape[1]] = img
         y = 0
 
         maxval = params[max(params, key=params.get)]
